@@ -104,7 +104,7 @@ let main = () => __awaiter(void 0, void 0, void 0, function* () {
             region["Date de prise de fonction"] = contactDet.priseDeFonction;
             region.Téléphone = contactDet.Téléphone;
             region.Email = contactDet.Email;
-            region["Address mairie"] = contactDet.Address;
+            region["Adresse mairie"] = contactDet.Address;
         }
         // J'exclus Url
         const modifiedRegionList = regionList.map((r) => {

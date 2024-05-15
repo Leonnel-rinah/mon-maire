@@ -95,7 +95,7 @@ let main = async () => {
             region["Date de prise de fonction"] = contactDet.priseDeFonction;
             region.Téléphone = contactDet.Téléphone;
             region.Email = contactDet.Email;
-            region["Address mairie"] = contactDet.Address;
+            region["Adresse mairie"] = contactDet.Address;
         }
 
         // J'exclus Url
