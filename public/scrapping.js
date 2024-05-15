@@ -87,7 +87,6 @@ let main = () => __awaiter(void 0, void 0, void 0, function* () {
                 const paragraphs = Array.from(document.querySelectorAll('div.post-content p'));
                 const text = (_a = paragraphs.map(p => p.textContent).find(m => m === null || m === void 0 ? void 0 : m.includes('que maire le'))) === null || _a === void 0 ? void 0 : _a.split('\n', 2)[1];
                 const dateCheck = /\b(\d{2}\/\d{2}\/\d{4})\b/g;
-                // Extraire la date en utilisant l'expression régulière
                 const match = text === null || text === void 0 ? void 0 : text.match(dateCheck);
                 const dateDePriseDeFonction = match ? match[0] : null;
                 const fullAddress = townName.map(t => t.textContent)[0] + ', ' +

@@ -74,7 +74,6 @@ let main = async () => {
 
                 const dateCheck = /\b(\d{2}\/\d{2}\/\d{4})\b/g;
 
-                // Extraire la date en utilisant l'expression régulière
                 const match = text?.match(dateCheck);
 
                 const dateDePriseDeFonction = match ? match[0] : null;
