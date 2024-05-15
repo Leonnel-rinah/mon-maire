@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -35,16 +46,16 @@ let main = () => __awaiter(void 0, void 0, void 0, function* () {
         // Naviguer vers l'URL de la région
         yield page.goto(regionUrl, { waitUntil: 'networkidle2' });
         // Extraire les données de la région de la page, Nom et Url de la riegion deje disponible a ce niveau.
-        const regionData = yield page.evaluate(() => {
-            const regionList = Array.from(document.querySelectorAll('.list-group-item a'));
+        const regionList = yield page.evaluate(() => {
+            const regionArray = Array.from(document.querySelectorAll('.list-group-item a'));
             // Je mappe chque object pour avoir uniquement la region et le url
-            return regionList.map((region) => ({
+            return regionArray.map((region) => ({
                 Région: region.innerText,
                 Url: region.href
             }));
         });
         // je loupe a travert chaque region pour extraire le nom de la vile, le nom du maire,
-        for (const region of regionData) {
+        for (const region of regionList) {
             // Naviguer vers l'URL de la ville
             yield page.goto(region.Url, { waitUntil: 'networkidle2' });
             const data = yield page.evaluate(() => {
@@ -96,21 +107,26 @@ let main = () => __awaiter(void 0, void 0, void 0, function* () {
             region.Email = contactDet.Email;
             region["Address mairie"] = contactDet.Address;
         }
+        // J'exclus Url
+        const modifiedRegionList = regionList.map((r) => {
+            let { Url } = r, newR = __rest(r, ["Url"]);
+            return newR;
+        });
         // Définir les en-têtes CSV basés sur les clés des données de la région
-        const headers = Object.keys(regionData[0]).map(key => ({ id: key, title: key }));
-        // Créer un écrivain CSV avec des en-têtes générés dynamiquement
+        const headers = Object.keys(modifiedRegionList[0]).map(key => ({ id: key, title: key }));
         const csvWriter = (0, csv_writer_1.createObjectCsvWriter)({
             path: 'mon_maire_scrapped.csv',
             header: headers
         });
         // Écrire les données de la région dans le fichier CSV
-        csvWriter.writeRecords(regionData)
+        csvWriter.writeRecords(modifiedRegionList)
             .then(() => {
             console.log('Fichier CSV créé avec succès!');
         })
             .catch((err) => {
             console.error('Erreur lors de l\'écriture du CSV:', err);
         });
+        yield browser.close();
     }
     catch (error) {
         console.error(error);

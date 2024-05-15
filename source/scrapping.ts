@@ -27,17 +27,17 @@ let main = async () => {
         await page.goto(regionUrl, { waitUntil: 'networkidle2' });
 
         // Extraire les données de la région de la page, Nom et Url de la riegion deje disponible a ce niveau.
-        const regionData: any = await page.evaluate(() => {
-            const regionList = Array.from(document.querySelectorAll('.list-group-item a'));
+        const regionList: any = await page.evaluate(() => {
+            const regionArray = Array.from(document.querySelectorAll('.list-group-item a'));
             // Je mappe chque object pour avoir uniquement la region et le url
-            return regionList.map((region: any) => ({
+            return regionArray.map((region: any) => ({
                 Région: region.innerText,
                 Url: region.href
             }));
         });
 
         // je loupe a travert chaque region pour extraire le nom de la vile, le nom du maire,
-        for (const region of regionData) {
+        for (const region of regionList) {
             // Naviguer vers l'URL de la ville
             await page.goto(region.Url, { waitUntil: 'networkidle2' });
 
@@ -99,23 +99,32 @@ let main = async () => {
             region["Address mairie"] = contactDet.Address;
         }
 
-        // Définir les en-têtes CSV basés sur les clés des données de la région
-        const headers = Object.keys(regionData[0]).map(key => ({ id: key, title: key }));
+        // J'exclus Url
+        const modifiedRegionList = regionList.map((r: any) => {
+            let { Url, ...newR } = r;
+            return newR;
+        });
 
-        // Créer un écrivain CSV avec des en-têtes générés dynamiquement
+        // Définir les en-têtes CSV basés sur les clés des données de la région
+        const headers = Object.keys(modifiedRegionList[0]).map(key => ({ id: key, title: key }));
+
         const csvWriter = createObjectCsvWriter({
             path: 'mon_maire_scrapped.csv',
             header: headers
         });
 
+
         // Écrire les données de la région dans le fichier CSV
-        csvWriter.writeRecords(regionData)
+        csvWriter.writeRecords(modifiedRegionList)
             .then(() => {
                 console.log('Fichier CSV créé avec succès!');
             })
             .catch((err) => {
                 console.error('Erreur lors de l\'écriture du CSV:', err);
             });
+
+
+        await browser.close()
 
     } catch (error) {
         console.error(error);
